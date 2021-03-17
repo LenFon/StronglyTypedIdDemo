@@ -16,20 +16,28 @@ namespace StronglyTypedIdDemo.Infrastructure
             if (type is null)
                 throw new ArgumentNullException(nameof(type));
 
-            if (type.BaseType is Type baseType &&
-                baseType.IsGenericType &&
-                baseType.GetGenericTypeDefinition() == typeof(StronglyTypedId<>))
+            var t = type;
+            while (t != null && t != typeof(object))
             {
+                if (t.IsGenericType &&
+                   t.GetGenericTypeDefinition() == typeof(StronglyTypedId<>))
+                {
 
-                idType = baseType.GetGenericArguments()[0];
-                return true;
+                    idType = t.GetGenericArguments()[0];
+                    return true;
+                }
+                else
+                {
+                    t = t.BaseType;
+                }
             }
+
 
             idType = null;
             return false;
         }
 
-        public static Func<TValue, object> GetFactory<TValue>(Type stronglyTypedIdType) where TValue : notnull 
+        public static Func<TValue, object> GetFactory<TValue>(Type stronglyTypedIdType) where TValue : notnull
             => (Func<TValue, object>)StronglyTypedIdFactories.GetOrAdd(stronglyTypedIdType, CreateFactory<TValue>);
 
         private static Func<TValue, object> CreateFactory<TValue>(Type stronglyTypedIdType) where TValue : notnull

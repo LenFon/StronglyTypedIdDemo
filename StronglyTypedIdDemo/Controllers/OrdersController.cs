@@ -38,7 +38,7 @@ namespace StronglyTypedIdDemo.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<Order> Get(OrderId id)
+        public async Task<Order> Get(OrderId id, ProductId id1)
         {
             return await _db.Orders.FirstOrDefaultAsync(w => w.Id == id);
         }
